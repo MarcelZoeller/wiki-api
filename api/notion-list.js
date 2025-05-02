@@ -20,9 +20,16 @@ export default async function handler(req, res) {
       const title = titleProperty?.Page?.title?.[0]?.text?.content || "Unbenannt";
       const id = page.id;
 
+      let parent = null;
+
+      if (page.parent?.database_id && page.parent.database_id !== databaseId) {
+        parent = page.parent;
+      }
+
       return { 
         'title': title,
         'id': id,
+        'parent': parent,
       };
     }); 
 
