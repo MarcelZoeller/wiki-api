@@ -6,11 +6,10 @@ export default async function handler(req, res) {
   try {
     // Holt alle erreichbaren Seiten (über "search")
     const response = await notion.search({
-      filter: {
-        value: "page",
-        property: "object"
-      }
-    });
+        filter: {
+          object: "page"
+        }
+      });
 
     const pages = response.results.map((page) => {
       const titleProp = Object.values(page.properties || {}).find(
