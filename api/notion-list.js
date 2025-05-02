@@ -21,7 +21,7 @@ export default async function handler(req, res) {
       if (!titleProperty || !titleProperty.Page.title.length <= 0 || !titleProperty.Page.title[0]?.text?.content) {
         return "Unbenannt";
       }
-      return titleProperty.title[0].content;
+      return titleProperty.Page.title[0].text.content;
     });
 
     res.status(200).json(titles);
