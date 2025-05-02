@@ -14,6 +14,8 @@ export default async function handler(req, res) {
       database_id: databaseId,
     });
 
+    res.status(200).json(response);
+
     const titles = response.results.map((page) => {
       const titleProperty = page.properties.Name;
       if (!titleProperty || !titleProperty.title || titleProperty.title.length === 0) {
