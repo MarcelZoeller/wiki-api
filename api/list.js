@@ -1,7 +1,7 @@
 // api/list.js
 export default async function handler(req, res) {
     const username = "marcelzoeller";
-    const repo = "wiki";
+    const repo = "wiki-data";
     const branch = "main"; // oder master
   
     const apiUrl = `https://api.github.com/repos/${username}/${repo}/git/trees/${branch}?recursive=1`;
