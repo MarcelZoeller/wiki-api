@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
     const file = req.query.file || "index.md";
-    const githubUser = "DEIN_USERNAME";
+    const githubUser = "marcelzoeller";
     const repo = "wiki-data";
     const branch = "main";
   
