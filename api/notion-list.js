@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
   
     const titles = response.results.map((page) => {
-      return page.id
+      return page.properties.Page.id
       /*const titleProperty = page.properties;
       if (!titleProperty || !titleProperty.Page.title.length <= 0 || !titleProperty.Page.title[0]?.text?.content) {
         return "Unbenannt";
