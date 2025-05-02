@@ -4,6 +4,7 @@
     "type": "module",
     "dependencies": {
       "@notionhq/client": "^2.2.3",
-      "notion-to-md": "^2.4.0"
+      "notion-to-md": "^2.4.0",
+      "googleapis": "^148.0.0"
     }
   }
