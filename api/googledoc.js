@@ -1,6 +1,12 @@
 import { google } from "googleapis";
 
 export default async function handler(req, res) {
+
+    const token = req.headers.authorization;
+    if (token !== `Bearer ${process.env.API_SECRET}`) {
+        return res.status(401).send("Nicht autorisiert");
+    }
+
   const { docId } = req.query;
 
   if (!docId) {
