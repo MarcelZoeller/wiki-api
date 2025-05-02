@@ -19,4 +19,3 @@ export default async function handler(req, res) {
     const content = await response.text();
     res.status(200).send(content);
   }
-  
