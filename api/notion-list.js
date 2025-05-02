@@ -16,12 +16,14 @@ export default async function handler(req, res) {
 
   
     const titles = response.results.map((page) => {
-      return page.properties.Page.title[0].text.content
-      /*const titleProperty = page.properties;
-      if (!titleProperty || !titleProperty.Page.title.length <= 0 || !titleProperty.Page.title[0]?.text?.content) {
-        return "Unbenannt";
-      }
-      return titleProperty.Page.title;*/
+      const titleProperty = page.properties;
+      const title = titleProperty?.Page?.title?.[0]?.text?.content || "Unbenannt";
+      const id = titleProperty.id;
+
+      return { 
+        'title': title,
+        'id': id,
+      };
     }); 
 
     res.status(200).json(titles);
