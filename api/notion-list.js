@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     const titles = response.results.map((page) => {
       const titleProperty = page.properties;
       const title = titleProperty?.Page?.title?.[0]?.text?.content || "Unbenannt";
-      const id = titleProperty.id;
+      const id = page.id;
 
       return { 
         'title': title,
