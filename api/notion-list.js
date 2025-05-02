@@ -14,14 +14,14 @@ export default async function handler(req, res) {
       database_id: databaseId,
     });
 
-    res.status(200).json(response);
+    
 
     const titles = response.results.map((page) => {
-      const titleProperty = page.properties.Name;
-      if (!titleProperty || !titleProperty.title || titleProperty.title.length === 0) {
+      const titleProperty = page.properties;
+      if (!titleProperty || !titleProperty.Page.title[0]?.text?.content) {
         return "Unbenannt";
       }
-      return titleProperty.title[0].plain_text;
+      return titleProperty.title[0].content;
     });
 
     res.status(200).json(titles);
