@@ -14,15 +14,15 @@ export default async function handler(req, res) {
       database_id: databaseId,
     });
 
-    
-
+  
     const titles = response.results.map((page) => {
-      const titleProperty = page.properties;
+      return page.id
+      /*const titleProperty = page.properties;
       if (!titleProperty || !titleProperty.Page.title.length <= 0 || !titleProperty.Page.title[0]?.text?.content) {
         return "Unbenannt";
       }
-      return titleProperty.Page.title[0].text.content;
-    });
+      return titleProperty.Page.title;*/
+    }); 
 
     res.status(200).json(titles);
   } catch (error) {
