@@ -3,6 +3,12 @@ import { Client } from "@notionhq/client";
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
 export default async function handler(req, res) {
+
+  const token = req.headers.authorization;
+  if (token !== `Bearer ${process.env.API_SECRET}`) {
+      return res.status(401).send("Nicht autorisiert");
+  }
+
   const databaseId = process.env.NOTION_DATABASE_ID;
 
   if (!databaseId || !process.env.NOTION_TOKEN) {

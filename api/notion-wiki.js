@@ -5,6 +5,12 @@ const notion = new Client({ auth: process.env.NOTION_TOKEN });
 const n2m = new NotionToMarkdown({ notionClient: notion });
 
 export default async function handler(req, res) {
+  
+  const token = req.headers.authorization;
+  if (token !== `Bearer ${process.env.API_SECRET}`) {
+      return res.status(401).send("Nicht autorisiert");
+  }
+  
   const { pageId } = req.query;
 
   try {
