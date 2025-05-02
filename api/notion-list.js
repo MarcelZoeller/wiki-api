@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 
       let parent = null;
 
-      if (page.parent?.database_id && page.parent.database_id === databaseId) {
+      if (page.parent?.database_id && page.parent.database_id.replace(/-/g, '') === databaseId) {
         parent = null
       } else {
         parent = page.parent;
