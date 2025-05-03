@@ -7,9 +7,19 @@ export default function BookViewer() {
   const viewerRef = useRef(null);
 
   useEffect(() => {
-    fetch("/api/complete")
-      .then((res) => res.text())
-      .then((text) => setContent(text));
+    fetch("/api/book/complete")
+      .then(async (res) => {
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`Fehler ${res.status}: ${errorText}`);
+        }
+        return res.text();
+      })
+      .then((text) => setContent(text))
+      .catch((err) => {
+        console.error("Fehler beim Laden des Buchtexts:", err.message);
+        setContent(`# Fehler beim Laden\n\n${err.message}`);
+      });
   }, []);
 
   const downloadPDF = () => {
