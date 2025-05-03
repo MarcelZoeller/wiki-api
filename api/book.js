@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     // }
   
     try {
-      // Schritt 1: SHA des Branches holen
+      // 1. Branch-SHA laden
       const refRes = await fetch(`https://api.github.com/repos/${username}/${repo}/git/ref/heads/${branch}`, {
         headers: {
           Authorization: `token ${process.env.GITHUB_TOKEN}`,
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       const refData = await refRes.json();
       const treeSha = refData.object.sha;
   
-      // Schritt 2: Baumstruktur holen
+      // 2. Git-Tree laden
       const treeRes = await fetch(
         `https://api.github.com/repos/${username}/${repo}/git/trees/${treeSha}?recursive=1`,
         {
@@ -31,28 +31,35 @@ export default async function handler(req, res) {
       );
       const treeData = await treeRes.json();
   
-      // Nur .md-Dateien aus /wiki/ filtern
-      const mdFiles = treeData.tree
-        .filter(item => item.path.startsWith("wiki/") && item.path.endsWith(".md"))
+      // 3. Nur Kapitel-Dateien extrahieren
+      const kapitelDateien = treeData.tree
+        .filter(item => item.path.startsWith("wiki/Kapitel/") && item.path.endsWith(".md"))
         .map(item => ({
-          path: item.path,
-          url: `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${item.path}`,
+          title: item.path.replace("wiki/Kapitel/", "").replace(".md", "").replace(/_/g, " "),
+          sha: item.sha,
         }))
-        .sort((a, b) => a.path.localeCompare(b.path)); // Optional: alphabetisch sortieren
+        .sort((a, b) => a.title.localeCompare(b.title)); // alphabetisch nach Titel
   
-      // Schritt 3: Inhalte laden
+      // 4. Inhalte laden via Blobs
       const contents = await Promise.all(
-        mdFiles.map(async (file) => {
-          const resp = await fetch(file.url);
-          const text = await resp.text();
-          const title = `# ${file.path.replace("wiki/", "").replace(/_/g, " ").replace(".md", "")}`;
-          return `${title}\n\n${text}\n\n`;
+        kapitelDateien.map(async ({ title, sha }) => {
+          const blobRes = await fetch(
+            `https://api.github.com/repos/${username}/${repo}/git/blobs/${sha}`,
+            {
+              headers: {
+                Authorization: `token ${process.env.GITHUB_TOKEN}`,
+                Accept: "application/vnd.github.v3.raw",
+              },
+            }
+          );
+          const text = await blobRes.text();
+          return `# ${title}\n\n${text}`;
         })
       );
   
-      // Schritt 4: Alles zusammenfügen und zurückgeben
-      const fullText = contents.join("");
-      res.setHeader("Content-Type", "text/plain");
+      // 5. Zusammenfügen und zurückgeben
+      const fullText = contents.join('\n\n---\n\n');
+      res.setHeader('Content-Type', 'text/plain');
       res.status(200).send(fullText);
   
     } catch (error) {
