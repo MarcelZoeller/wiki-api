@@ -22,8 +22,8 @@ export default async function handler(req, res) {
 
         // Filtere nur .md-Dateien aus /wiki
         const files = data.tree
-            .filter(item => item.path.startsWith("/") && item.path.endsWith(".md"))
-            .map(item => item.path.replace("/", ""));
+            .filter(item => item.path.startsWith("wiki/") && item.path.endsWith(".md"))
+            .map(item => item.path.replace("wiki/", ""));
 
         res.status(200).json(files);
     } catch (error) {
