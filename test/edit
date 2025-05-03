@@ -1,0 +1,141 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Wiki API (GitHub & Notion)",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://wiki-api-iota.vercel.app"
+        }
+    ],
+    "paths": {
+        "/api/wiki": {
+            "get": {
+                "operationId": "getWikiFile",
+                "summary": "Lade eine bestimmte Markdown-Datei aus dem GitHub-Wiki",
+                "parameters": [
+                    {
+                        "name": "file",
+                        "in": "query",
+                        "required": true,
+                        "description": "Pfad zur Datei im Wiki (z. B. figuren/finja.md)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Markdown-Inhalt der Datei",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/list": {
+            "get": {
+                "operationId": "listWikiFiles",
+                "summary": "Liste aller verfügbaren Markdown-Dateien im GitHub-Wiki",
+                "responses": {
+                    "200": {
+                        "description": "Liste von Dateipfaden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/notion-list": {
+            "get": {
+                "operationId": "listNotionPages",
+                "summary": "Liste aller verfügbaren Notion-Wiki-Seiten",
+                "responses": {
+                    "200": {
+                        "description": "Liste von Wiki-Seiten mit Titel und ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "id": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/notion-wiki": {
+            "get": {
+                "operationId": "getNotionPage",
+                "summary": "Lade den Inhalt einer bestimmten Notion-Seite",
+                "parameters": [
+                    {
+                        "name": "pageId",
+                        "in": "query",
+                        "required": true,
+                        "description": "Die Notion Page ID (z. B. 1e4a676e5fd280ebb07fe62f09f88ba6)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Klartext-Inhalt der Notion-Seite",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/googledoc?docId=1xPhOfVD7tYS1KZgL4FG81ab1wil_IWc0c6XhfBXGRAU": {
+            "get": {
+                "operationId": "getGoogleDocBook",
+                "summary": "Lade ein fest eingebundenes Google Docs Dokument über eine feste URL",
+                "description": "Diese Action lädt ein fest verlinktes Google-Dokument, ohne dass Parameter notwendig sind.",
+                "responses": {
+                    "200": {
+                        "description": "Rohtext-Inhalt des Dokuments",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
