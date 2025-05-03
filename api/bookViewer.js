@@ -7,7 +7,7 @@ export default function BookViewer() {
   const viewerRef = useRef(null);
 
   useEffect(() => {
-    fetch("/api/book/complete")
+    fetch("/api/complete")
       .then(async (res) => {
         if (!res.ok) {
           const errorText = await res.text();
