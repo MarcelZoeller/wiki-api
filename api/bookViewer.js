@@ -1,53 +1,65 @@
-import { useEffect, useState, useRef } from "react";
-import ReactMarkdown from "react-markdown";
-import html2pdf from "html2pdf.js";
-
-export default function BookViewer() {
-  const [content, setContent] = useState("");
-  const viewerRef = useRef(null);
-
-  useEffect(() => {
-    fetch("/api/complete")
-      .then(async (res) => {
-        if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(`Fehler ${res.status}: ${errorText}`);
-        }
-        return res.text();
-      })
-      .then((text) => setContent(text))
-      .catch((err) => {
-        console.error("Fehler beim Laden des Buchtexts:", err.message);
-        setContent(`# Fehler beim Laden\n\n${err.message}`);
+export default async function handler(req, res) {
+    const username = "marcelzoeller";
+    const repo = "wiki-data";
+    const branch = "main";
+  
+    try {
+      // 1. Branch-SHA laden
+      const refRes = await fetch(`https://api.github.com/repos/${username}/${repo}/git/ref/heads/${branch}`, {
+        headers: {
+          Authorization: `token ${process.env.GITHUB_TOKEN}`,
+          Accept: "application/vnd.github+json",
+        },
       });
-  }, []);
-
-  const downloadPDF = () => {
-    const element = viewerRef.current;
-    const opt = {
-      margin: 0.5,
-      filename: "Demonic_Buch.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-    };
-    html2pdf().from(element).set(opt).save();
-  };
-
-  return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">📘 Demonic – Buchansicht</h1>
-        <button
-          onClick={downloadPDF}
-          className="bg-blue-600 text-white px-4 py-2 rounded shadow"
-        >
-          📥 Als PDF speichern
-        </button>
-      </div>
-      <div ref={viewerRef} className="prose prose-lg max-w-none">
-        <ReactMarkdown>{content}</ReactMarkdown>
-      </div>
-    </div>
-  );
-}
+      const refData = await refRes.json();
+      const treeSha = refData.object.sha;
+  
+      // 2. Git-Tree laden
+      const treeRes = await fetch(
+        `https://api.github.com/repos/${username}/${repo}/git/trees/${treeSha}?recursive=1`,
+        {
+          headers: {
+            Authorization: `token ${process.env.GITHUB_TOKEN}`,
+            Accept: "application/vnd.github+json",
+          },
+        }
+      );
+      const treeData = await treeRes.json();
+  
+      // 3. Nur Kapitel-Dateien extrahieren
+      const kapitelDateien = treeData.tree
+        .filter(item => item.path.startsWith("wiki/Kapitel/") && item.path.endsWith(".md"))
+        .map(item => ({
+          title: item.path.replace("wiki/Kapitel/", "").replace(".md", "").replace(/_/g, " "),
+          sha: item.sha,
+        }))
+        .sort((a, b) => a.title.localeCompare(b.title));
+  
+      // 4. Inhalte via Blob-SHA laden
+      const contents = await Promise.all(
+        kapitelDateien.map(async ({ title, sha }) => {
+          const blobRes = await fetch(
+            `https://api.github.com/repos/${username}/${repo}/git/blobs/${sha}`,
+            {
+              headers: {
+                Authorization: `token ${process.env.GITHUB_TOKEN}`,
+                Accept: "application/vnd.github.v3.raw",
+              },
+            }
+          );
+          const text = await blobRes.text();
+          return `# ${title}\n\n${text}`;
+        })
+      );
+  
+      // 5. Zusammenfügen und zurückgeben
+      const fullText = contents.join("\n\n---\n\n");
+      res.setHeader("Content-Type", "text/plain");
+      res.status(200).send(fullText);
+  
+    } catch (error) {
+      console.error("API-Fehler:", error);
+      res.status(500).send("Fehler beim Laden des Buches: " + error.message);
+    }
+  }
+  
