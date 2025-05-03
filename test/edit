@@ -136,6 +136,25 @@
                     }
                 }
             }
+        },
+        "/api/book": {
+            "get": {
+                "operationId": "getBook",
+                "summary": "Ließt das gesamte Buch aus dem GitHub-Wiki",
+                "description": "Diese Action lädt das gesamte Buch aus dem GitHub-Wiki und gibt es als Markdown zurück.",
+                "responses": {
+                    "200": {
+                        "description": "Markdown-Inhalt des Buches",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
